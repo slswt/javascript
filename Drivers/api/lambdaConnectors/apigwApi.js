@@ -3,10 +3,16 @@ import axios from 'axios';
 import { parse } from 'url';
 import camelCase from 'lodash/camelCase';
 import setAwsRegion from '../../setAwsRegion';
+import pkgDir from 'pkg-dir';
+import path from 'path';
 
 setAwsRegion(AWS);
 
 const apigwApi = async (path, ...data) => {
+  if (process.env.SLSWT_LOCAL_INVOKE) {
+    /* wip */
+    // const slswtDir = pkgDir.sync()
+  }
   try {
     const url = `${process.env.GW_URL}/${process.env.DEPLOYMENT_ENV}/${camelCase(path)}`;
     const req = new AWS.HttpRequest(url, process.env.AWS_REGION);

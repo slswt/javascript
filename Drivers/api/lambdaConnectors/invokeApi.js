@@ -2,24 +2,28 @@ import AWS from 'aws-sdk';
 import snakeCase from 'lodash/snakeCase';
 import get from 'lodash/get';
 import setAwsRegion from '../../setAwsRegion';
+import requiredParam from '@slswt/utils/requiredParam';
+import crypto from 'crypto';
 
 setAwsRegion(AWS);
-const crypto = require('crypto');
 
-const invokeApi = (lambdaPath, entry, ...args) => {
-  const lambda = new AWS.Lambda();
-
-  const longName = `${process.env.LAMBDA_NAME_PREFIX}_${snakeCase(
-    lambdaPath
-  )}_${entry}`;
-
-  const FunctionName = crypto
+const md5 = (what) =>
+  crypto
     .createHash('md5')
-    .update(longName)
+    .update(what)
     .digest('hex');
 
+const invokeApi = (entry, ...args) => {
+  const lambda = new AWS.Lambda();
+
+  const FunctionName = md5(entry);
+
   console.log({
-    longName, FunctionName, lambdaPath, entry, args,
+    longName,
+    FunctionName,
+    lambdaPath,
+    entry,
+    args,
   });
 
   const async = get(args, '0.async', false);
@@ -55,10 +59,14 @@ const invokeApi = (lambdaPath, entry, ...args) => {
           return;
         }
         if (!async) {
-          resolve(`invoked ${FunctionName}`);
-          return;
+          try {
+            resolve(JSON.parse(responsePayload));
+          } catch (err) {
+            resolve(responsePayload);
+          }
+        } else {
+          resolve(response);
         }
-        resolve(JSON.parse(responsePayload));
       }
     );
   });

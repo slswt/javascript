@@ -19,7 +19,11 @@ const returnExecuteApiResults = (input) => {
   };
 };
 
-export default (fn) => async (event) => {
+export default (fn) => async (...args) => {
+  const event = args[0];
+  if (process.env.SLSWT_LOCAL_INVOKE) {
+    return fn(...args);
+  };
   const body = get(event, 'body');
   if (typeof body === 'undefined') {
     console.log(

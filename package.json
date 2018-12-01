@@ -19,8 +19,10 @@
   },
   "homepage": "https://github.com/slswt/javascript#readme",
   "dependencies": {
+    "@slswt/utils": "^0.0.3",
     "axios": "^0.18.0",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "pkg-dir": "^3.0.0"
   },
   "peerDependencies": {
     "aws-sdk": "*"
